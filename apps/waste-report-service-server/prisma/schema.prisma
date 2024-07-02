@@ -1,0 +1,83 @@
+datasource db {
+  provider = "mongodb"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Report {
+  assignments Assignment[]
+  createdAt   DateTime          @default(now())
+  description String?
+  id          String            @id @default(auto()) @map("_id") @db.ObjectId
+  imageUrl    String?
+  location    String?
+  reportedBy  String?
+  status      EnumReportStatus?
+  updatedAt   DateTime          @updatedAt
+}
+
+model Authority {
+  area        String?
+  assignments Assignment[]
+  createdAt   DateTime     @default(now())
+  email       String?
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
+  name        String?
+  updatedAt   DateTime     @updatedAt
+}
+
+model Assignment {
+  authority      Authority?            @relation(fields: [authorityId], references: [id])
+  authorityId    String?               @db.ObjectId
+  collector      Collector?            @relation(fields: [collectorId], references: [id])
+  collectorId    String?               @db.ObjectId
+  createdAt      DateTime              @default(now())
+  id             String                @id @default(auto()) @map("_id") @db.ObjectId
+  report         Report?               @relation(fields: [reportId], references: [id])
+  reportId       String?               @db.ObjectId
+  status         EnumAssignmentStatus?
+  updatedAt      DateTime              @updatedAt
+  updateImageUrl String?
+}
+
+model Collector {
+  assignments Assignment[]
+  createdAt   DateTime             @default(now())
+  email       String?
+  id          String               @id @default(auto()) @map("_id") @db.ObjectId
+  name        String?
+  status      EnumCollectorStatus?
+  updatedAt   DateTime             @updatedAt
+}
+
+model User {
+  createdAt DateTime      @default(now())
+  email     String?       @unique
+  firstName String?
+  id        String        @id @default(auto()) @map("_id") @db.ObjectId
+  lastName  String?
+  password  String
+  role      EnumUserRole?
+  roles     Json
+  updatedAt DateTime      @updatedAt
+  username  String        @unique
+}
+
+enum EnumReportStatus {
+  Option1
+}
+
+enum EnumAssignmentStatus {
+  Option1
+}
+
+enum EnumCollectorStatus {
+  Option1
+}
+
+enum EnumUserRole {
+  Option1
+}
